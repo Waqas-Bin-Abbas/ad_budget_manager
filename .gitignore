@@ -1,0 +1,20 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# SQLite database files
+*.sqlite3
+
+# Flask instance folder
+instance/
+
+# Alembic versions folder
+alembic/versions/*
