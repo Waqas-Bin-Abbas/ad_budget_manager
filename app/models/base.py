@@ -1,6 +1,8 @@
 from datetime import datetime
-from typing import List, Optional, Self
+from typing import Optional, Self
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -20,23 +22,19 @@ class Base(DeclarativeBase):
     deleted: Mapped[datetime]
 
     @classmethod
-    def get(cls, id: int, options=None) -> Self | None:
+    async def get(cls, id: int, db: AsyncSession) -> Self | None:
         """Get a model instance by ID."""
-        return get_db().session.get(cls, id, options=options)
+        result = await db.execute(select(cls).filter(cls.id == id))
+        return result.scalars().first()
 
     @classmethod
-    def get_all(cls, options=None) -> List[Self] | None:
+    async def get_all(cls, db: AsyncSession):
         """Get all instances of a model."""
-        return get_db().session.query(cls).all()
+        result = await db.execute(select(cls))
+        return result.scalars().all()
 
-    def save(self):
-        """Save the model instance."""
-        get_db().session.add(self)
-        get_db().session.commit()
-        get_db().session.refresh(self)
-        return self
-
-    def delete(self):
-        """Save the model instance."""
-        get_db().session.delete(self)
-        get_db().session.commit()
+    async def save(self, db: AsyncSession):
+        async with db.begin():
+            db.add(self)
+        await db.commit()
+        await db.refresh(self)
