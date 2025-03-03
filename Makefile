@@ -17,12 +17,13 @@ all: install run
 venv:
 	@echo "Creating virtual environment..."
 	python3 -m venv $(VENV_NAME)
+	@echo "Virtual environment $(VENV_NAME) created."
+	@echo "Run 'source $(VENV_NAME)/bin/activate' to activate it."
 
 # Install dependencies into the virtual environment
 .PHONY: install
 install: venv
 	@echo "Installing dependencies..."
-	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt
 
 # Run both Uvicorn and Celery workers in the background

@@ -1,0 +1,47 @@
+# Data Structures
+Brand:
+    - id (int)
+    - name (string)
+    - monthly_budget (float)
+    - daily_budget (float)
+    - daily_spent (float)
+    - monthly_spent (float)
+
+Campaign:
+    - id (int)
+    - brand_id (int)  [Foreign Key -> Brand]
+    - is_active (bool)
+    - dayparting_start (int)
+    - dayparting_end (int)
+
+# Core Functions
+1. update_campaign_spend(brand_id, campaign_id, amount)
+    - Increment daily and monthly spend for the brand.
+    - If daily_budget is exceeded, turn off all campaigns for the brand.
+    - If monthly_budget is exceeded, turn off all campaigns for the brand.
+
+2. is_within_active_hours(campaign)
+    - If the current time is within allowed hours, returns True.
+    - Otherwise, returns False.
+
+3. reset_daily_budgets()
+    - Runs at midnight.
+    - Resets daily spend for all brands.
+    - Turns ON campaigns that were turned off due to daily budget limits.
+
+4. reset_monthly_budgets()
+    - Runs at the start of a new month.
+    - Resets monthly spend for all brands.
+    - Turns ON campaigns that were turned off due to monthly budget limits.
+
+5. pause_campaigns_if_budget_exceeded(brand_id)
+    - Checks if the daily or monthly budget for a brand exceeded.
+    - If the budget exceeds, pause all the campaigns for that brand.
+
+6. activate_campaigns()
+    - Activates the campaigns for a brand.
+
+7. Scheduled Tasks
+    - Run `reset_daily_budgets()` at midnight every day.
+    - Run `reset_monthly_budgets()` at the start of every month.
+    - Run `activate_campaigns()` at midnight every day.
