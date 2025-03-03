@@ -1,12 +1,10 @@
 from datetime import datetime
-import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.brand import Brand
 from app.models.campaign import Campaign
-
-logger = logging.getLogger(__name__)
+from app.services.budget_service import BudgetService
 
 
 class CampaignService:
@@ -34,21 +32,21 @@ class CampaignService:
                 "message": "Campaign is not available at this time.",
             }
 
-        if brand.daily_spent + amount > brand.daily_budget:
-            return {
-                "success": False,
-                "message": "Amount provided is greater than available daily limit.",
-            }
-
         if brand.monthly_spent + amount > brand.monthly_budget:
             return {
                 "success": False,
                 "message": "Amount provided is greater than available monthly limit.",
             }
 
+        if brand.daily_spent + amount > brand.daily_budget:
+            return {
+                "success": False,
+                "message": "Amount provided is greater than available daily limit.",
+            }
+
         brand.daily_spent += amount
         brand.monthly_spent += amount
-        brand.manage_campaigns(db)
+        await BudgetService.pause_campaigns_if_budget_exceeded(brand.id, db)
 
         await db.commit()
         return {
